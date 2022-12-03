@@ -21,8 +21,10 @@ def generate_template(year: int, day: int) -> int:
                 raise NotImplementedError
                 # return answer_part_1, answer_part_2
             
-            TEST_EXPECTED = None
-            TEST_INPUT = ""
+            
+            TEST_EXPECTED = (None, None)
+            TEST_INPUT = """\\
+            """
             '''))
         (challenge_path / "input.txt").touch()
     except FileExistsError:
@@ -41,9 +43,15 @@ def load_and_run_solver(year: int, day: int) -> int:
         print(f"ERROR: A solver for challenge {module_name} not found.")
         return 1
 
-    test_result = challenge.solve(challenge.TEST_INPUT)[0]
-    test_expected = challenge.TEST_EXPECTED
-    assert test_result == test_expected, f"{test_result=} {test_expected=}"
+    test_result = challenge.solve(challenge.TEST_INPUT)
+    if isinstance(challenge.TEST_EXPECTED, tuple):
+        test_expected = challenge.TEST_EXPECTED
+    else:
+        test_expected = challenge.TEST_EXPECTED, None
+    for part, result in enumerate(test_result):
+        if None in [result, test_expected[part]]:
+            continue
+        assert result == test_expected[part], f"Test Part {part + 1}: got: {result}; expected: {test_expected[part]}"
 
     puzzle_input = (Path(challenge.__file__).parent / "input.txt").read_text()
     answer_part_1, answer_part_2 = challenge.solve(puzzle_input)

@@ -44,10 +44,7 @@ KEY_MOVE_MAP = {
 }
 
 
-def solve(strategy_guide: str) -> tuple[int, int | None]:
-    rounds = [itemgetter(*round.split())(KEY_MOVE_MAP)
-              for round in strategy_guide.splitlines()]
-
+def calc_score(rounds):
     total_score = 0
     for opponent_move, my_move in rounds:
         total_score += POINTS_PER_MOVE[type(my_move)]
@@ -58,11 +55,39 @@ def solve(strategy_guide: str) -> tuple[int, int | None]:
             total_score += 0
         else:  # draw
             total_score += 3
+    return total_score
 
-    return total_score, -1
+
+# Rock < Paper < Scissors < Rock ...
+move_map = [Rock, Paper, Scissors]
+outcome_map = {
+    "X": -1,  # lose
+    "Y": 0,  # draw
+    "Z": 1,  # win
+}
 
 
-TEST_EXPECTED = 15
+def solve(strategy_guide: str) -> tuple[int, int | None]:
+    def part_1_move_translator(opponent_code, my_code):
+        return itemgetter(opponent_code, my_code)(KEY_MOVE_MAP)
+
+    def part_2_move_translator(opponent_code, outcome_code):
+        opponent_move = KEY_MOVE_MAP[opponent_code]
+        outcome_move = move_map[
+            (move_map.index(type(opponent_move)) + outcome_map[outcome_code])
+            % len(move_map)
+        ]()
+        return opponent_move, outcome_move
+
+    return (
+        calc_score(part_1_move_translator(*s.split())
+                   for s in strategy_guide.splitlines()),
+        calc_score(part_2_move_translator(*s.split())
+                   for s in strategy_guide.splitlines())
+    )
+
+
+TEST_EXPECTED = (15, 12)
 TEST_INPUT = """\
 A Y
 B X
