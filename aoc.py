@@ -17,13 +17,12 @@ def generate_template(year: int, day: int) -> int:
     try:
         with challenge_solver.open("x") as f:
             f.write(dedent('''\
-            def solve(puzzle_input: str) -> tuple[int, int]:
+            def solve(puzzle_input: str) -> tuple[int, int | None]:
                 raise NotImplementedError
-            
+                # return answer_part_1, answer_part_2
             
             TEST_EXPECTED = None
-            TEST_INPUT = """\
-            """
+            TEST_INPUT = ""
             '''))
         (challenge_path / "input.txt").touch()
     except FileExistsError:
@@ -42,13 +41,16 @@ def load_and_run_solver(year: int, day: int) -> int:
         print(f"ERROR: A solver for challenge {module_name} not found.")
         return 1
 
-    assert challenge.solve(challenge.TEST_INPUT)[0] == challenge.TEST_EXPECTED
+    test_result = challenge.solve(challenge.TEST_INPUT)[0]
+    test_expected = challenge.TEST_EXPECTED
+    assert test_result == test_expected, f"{test_result=} {test_expected=}"
 
     puzzle_input = (Path(challenge.__file__).parent / "input.txt").read_text()
     answer_part_1, answer_part_2 = challenge.solve(puzzle_input)
     print(f"Advent of Code {year} – Day {day}\n"
-          f"  Part 1: {answer_part_1}\n"
-          f"  Part 2: {answer_part_2}")
+          f"  Part 1: {answer_part_1}")
+    if answer_part_2 is not None:
+        print(f"  Part 2: {answer_part_2}")
     return 0
 
 
