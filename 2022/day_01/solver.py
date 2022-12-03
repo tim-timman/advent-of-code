@@ -23,19 +23,4 @@ TEST_INPUT = """\
 10000
 """
 
-TEST_RESULT = 24000
-
-
-def main():
-    assert solve(TEST_INPUT)[0] == TEST_RESULT
-
-    from pathlib import Path
-    puzzle_input = (Path(__file__).parent / "input.txt").read_text()
-    answer_part_1, answer_part_2 = solve(puzzle_input)
-    print(f"Answer part 1: {answer_part_1}\n"
-          f"Answer part 2: {answer_part_2}")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+TEST_EXPECTED = 24000
