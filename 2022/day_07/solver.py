@@ -46,10 +46,18 @@ def construct_file_system(input_str: str):
     return directories
 
 
+TOTAL_SPACE = 70000000
+MIN_REQUIRED = 30000000
+
+
 def solve(puzzle_input: str) -> tuple[int, int | None]:
     directories = construct_file_system(puzzle_input)
     answer_part_1 = sum(d.size for d in directories.values() if d.size <= 100000)
-    answer_part_2 = None
+
+    root_size = directories[PurePath("/")].size
+    answer_part_2 = next(size for size in sorted(d.size for d in directories.values())
+                         if TOTAL_SPACE - root_size + size >= MIN_REQUIRED)
+
     return answer_part_1, answer_part_2
 
 
