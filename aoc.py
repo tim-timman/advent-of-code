@@ -69,7 +69,7 @@ def main() -> int:
     parser.add_argument("-y", "--year", type=int, default="2022",
                         help="Advent of Code year (default: %(default)s)")
     parser.add_argument("-d", "--day", type=int, default=None,
-                        help="challenge day (defaults to latest")
+                        help="challenge day (defaults to latest)")
 
     args = parser.parse_args()
 
