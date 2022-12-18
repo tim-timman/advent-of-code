@@ -2,7 +2,11 @@ from collections import deque
 import re
 
 
-def parse_stacks(stack_str: str) -> list[deque]:
+Stacks = list[deque]
+Moves = list[tuple[int, int, int]]
+
+
+def parse_stacks(stack_str: str) -> Stacks:
     stack_lines = stack_str.splitlines()
     # Note: convert stack to stack index
     stack_map = {i: int(v) - 1 for i, v in enumerate(stack_lines[-1][1::4])}
@@ -19,7 +23,7 @@ def parse_stacks(stack_str: str) -> list[deque]:
 move_re = re.compile(r"^move (\d+) from (\d) to (\d)$", re.MULTILINE)
 
 
-def parse_moves(move_str: str) -> list[tuple[int, int, int]]:
+def parse_moves(move_str: str) -> Moves:
     # Note: convert stack to stack indices
     moves = [(int(m[0]), int(m[1]) - 1, int(m[2]) - 1)
              for m in move_re.findall(move_str)]
@@ -32,22 +36,40 @@ def print_stacks(stacks: list[deque]):
     print("---")
 
 
-def solve(puzzle_input: str) -> tuple[str, str | None]:
-    stack_str, _, move_str = puzzle_input.partition("\n\n")
-
-    stacks = parse_stacks(stack_str)
-    moves: list[tuple[int, int, int]] = parse_moves(move_str)
-
+def apply_moves_part1(stacks: Stacks, moves: Moves) -> Stacks:
     for num, from_stack, to_stack in moves:
         for _ in range(num):
             stacks[to_stack].append(stacks[from_stack].pop())
 
-    answer_part_1 = "".join(x[-1] for x in stacks)
-    answer_part_2 = None
+    return stacks
+
+
+def apply_moves_part2(stacks: Stacks, moves: Moves) -> Stacks:
+    for num, from_stack, to_stack in moves:
+        stacks[to_stack].extend([stacks[from_stack].pop() for _ in range(num)][::-1])
+
+    return stacks
+
+
+def extract_top(stacks: Stacks) -> str:
+    return "".join(x[-1] for x in stacks)
+
+
+def solve(puzzle_input: str) -> tuple[str, str | None]:
+    stack_str, _, move_str = puzzle_input.partition("\n\n")
+
+    stacks_part1 = parse_stacks(stack_str)
+    stacks_part2 = parse_stacks(stack_str)
+    moves = parse_moves(move_str)
+
+    apply_moves_part1(stacks_part1, moves)
+    answer_part_1 = extract_top(stacks_part1)
+    apply_moves_part2(stacks_part2, moves)
+    answer_part_2 = extract_top(stacks_part2)
     return answer_part_1, answer_part_2
 
 
-TEST_EXPECTED = ("CMZ", None)
+TEST_EXPECTED = ("CMZ", "MCD")
 TEST_INPUT = """\
     [D]    
 [N] [C]    
